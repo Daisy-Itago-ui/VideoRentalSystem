@@ -4,16 +4,30 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
+/**
+ * <h1>HelloController Class</h1>
+ * This JavaFX Controller manages the User Interface on the Client side,
+ * executing operations by sending requests to a centralized RMI Server application
+ * instead of invoking direct database DAO handlers locally.
+ *
+ * @author Daisy Itago
+ * @version 1.0
+ */
 public class HelloController {
 
-    // --- 1. THE MASTER BUCKETS (Observable lists that update the screen dynamically) ---
+    // --- 1. NETWORK CONTROLLER STUB LINK ---
+    private RemoteRentalService remoteService;
+
+    // --- 2. THE MASTER BUCKETS (Observable lists that update the screen dynamically) ---
     private ObservableList<Genre> allGenres = FXCollections.observableArrayList();
     private ObservableList<Movie> allMovies = FXCollections.observableArrayList();
     private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
     private ObservableList<Rental> allRentals = FXCollections.observableArrayList();
 
-    // --- 2. THE UI LINKS (Mapped directly to your fx:id tags in the .fxml file) ---
+    // --- 3. THE UI LINKS (Mapped directly to your fx:id tags in the .fxml file) ---
     @FXML private TextField txtGenreName;
     @FXML private ListView<Genre> listGenres;
 
@@ -28,63 +42,83 @@ public class HelloController {
     @FXML private ComboBox<Movie> comboRentalMovie;
     @FXML private ListView<Rental> listRentals;
 
-    // --- AUTOMATIC DATABASE INITIAL LOAD ---
+    // --- AUTOMATIC NETWORK INITIALIZATION LOAD ---
     @FXML
     public void initialize() {
-        // This executes the millisecond the window opens
         try {
+            System.out.println("Client UI connecting to centralized RMI Server Registry...");
+
+            // Step A: Locate the local loopback network registry running on port 1099
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+
+            // Step B: Look up the remote proxy stub via its verified identifier name
+            remoteService = (RemoteRentalService) registry.lookup("VlsRentalService");
+            System.out.println("Network link established! Remote service stub successfully assigned.");
+
+            // Trigger the initial data population across the network link
             refreshAllUILists();
+
         } catch (Throwable t) {
             System.out.println("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            System.out.println("FOUND THE EXACT RUNTIME CRASH:");
+            System.out.println("DISTRIBUTED NETWORK ATTACHMENT ERROR:");
             t.printStackTrace();
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
         }
     }
 
-    // Helper method to sync our JavaFX ObservableLists with the database tables
+    // Helper method to sync our JavaFX ObservableLists with the database via the remote server stub
     private void refreshAllUILists() {
-        // Clear local memory buckets to prevent duplicate stacking when items are refreshed
-        allGenres.clear();
-        allMovies.clear();
-        allCustomers.clear();
-        allRentals.clear();
+        try {
+            // Clear local client memory window buckets to prevent duplicate stacking
+            allGenres.clear();
+            allMovies.clear();
+            allCustomers.clear();
+            allRentals.clear();
 
-        // Populate local memory lists with fresh data from MariaDB DAOs
-        allGenres.addAll(GenreDAO.getAllGenres());
-        allMovies.addAll(MovieDAO.getAllMovies());
-        allCustomers.addAll(CustomerDAO.getAllCustomers());
+            // Populate local memory lists with fresh data retrieved via RMI network streams
+            allGenres.addAll(remoteService.getAllGenres());
+            allMovies.addAll(remoteService.getAllMovies());
+            allCustomers.addAll(remoteService.getAllCustomers());
+            allRentals.addAll(remoteService.getAllRentals());
 
-        // OPTIONAL: If your assignment requires showing historical transactions from database on start
-        allRentals.addAll(RentalDAO.getAllRentals());
+            // Push the synchronized data directly into your visual UI components
+            listGenres.setItems(allGenres);
+            comboMovieGenre.setItems(allGenres);
 
-        // Push the synchronized data directly into your visual UI components
-        listGenres.setItems(allGenres);
-        comboMovieGenre.setItems(allGenres);
+            listMovies.setItems(allMovies);
+            comboRentalMovie.setItems(allMovies);
 
-        listMovies.setItems(allMovies);
-        comboRentalMovie.setItems(allMovies);
+            listCustomers.setItems(allCustomers);
+            comboRentalCustomer.setItems(allCustomers);
 
-        listCustomers.setItems(allCustomers);
-        comboRentalCustomer.setItems(allCustomers);
+            listRentals.setItems(allRentals);
 
-        listRentals.setItems(allRentals);
+        } catch (Exception e) {
+            System.err.println("Network exception caught while refreshing layout lists:");
+            e.printStackTrace();
+        }
     }
 
-    // --- 3. THE INTERACTIVE BUTTON ACTIONS ---
+    // --- 4. THE INTERACTIVE BUTTON ACTIONS ROUTED VIA RMI ---
 
     @FXML
     protected void onSaveGenreClick() {
         String name = txtGenreName.getText().trim();
         if (!name.isEmpty()) {
-            // 1. Create the local object
-            Genre newGenre = new Genre(name);
-            // 2. Save it permanently to MariaDB via the DAO layer
-            GenreDAO.saveGenre(newGenre);
+            try {
+                // 1. Create the local data boundary object
+                Genre newGenre = new Genre(name);
 
-            // 3. Clear text box input and pull fresh synchronized data from the database
-            txtGenreName.clear();
-            refreshAllUILists();
+                // 2. Forward the object across the network stream to the Server
+                remoteService.saveGenre(newGenre);
+
+                // 3. Clean up the UI view interface
+                txtGenreName.clear();
+                refreshAllUILists();
+            } catch (Exception e) {
+                System.err.println("RMI transmission error on saving genre:");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -94,14 +128,20 @@ public class HelloController {
         Genre selectedGenre = comboMovieGenre.getValue();
 
         if (!title.isEmpty() && selectedGenre != null) {
-            // 1. Create the local object (OOP Composition link)
-            Movie newMovie = new Movie(title, selectedGenre);
-            // 2. Save it permanently to MariaDB (Maps properties to foreign key IDs)
-            MovieDAO.saveMovie(newMovie);
+            try {
+                // 1. Create the local object layout structure
+                Movie newMovie = new Movie(title, selectedGenre);
 
-            // 3. Clear text input and refresh lists
-            txtMovieTitle.clear();
-            refreshAllUILists();
+                // 2. Forward the object across the network stream to the Server
+                remoteService.saveMovie(newMovie);
+
+                // 3. Reset input states cleanly
+                txtMovieTitle.clear();
+                refreshAllUILists();
+            } catch (Exception e) {
+                System.err.println("RMI transmission error on saving movie:");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -109,40 +149,46 @@ public class HelloController {
     protected void onSaveCustomerClick() {
         String fullName = txtCustomerName.getText().trim();
         if (!fullName.isEmpty()) {
-            // 1. Create the local object
-            Customer newCustomer = new Customer(fullName);
-            // 2. Save it permanently to MariaDB clients table
-            CustomerDAO.saveCustomer(newCustomer);
+            try {
+                // 1. Create the local identity record object
+                Customer newCustomer = new Customer(fullName);
 
-            // 3. Clear text input box and sync UI lists
-            txtCustomerName.clear();
-            refreshAllUILists();
+                // 2. Forward the object across the network stream to the Server
+                remoteService.saveCustomer(newCustomer);
+
+                // 3. Refresh interface components completely
+                txtCustomerName.clear();
+                refreshAllUILists();
+            } catch (Exception e) {
+                System.err.println("RMI transmission error on saving customer:");
+                e.printStackTrace();
+            }
         }
     }
 
-    // 🔄 MODIFIED SECTION: Handles database mapping AND real-time display simultaneously
     @FXML
     protected void onRentMovieClick() {
         Customer c = comboRentalCustomer.getValue();
         Movie m = comboRentalMovie.getValue();
 
         if (c != null && m != null) {
-            // 1. Create the local transaction object
-            Rental newRental = new Rental(c, m);
+            try {
+                // 1. Create the local transaction assignment record object
+                Rental newRental = new Rental(c, m);
 
-            // 2. Save it permanently to MariaDB rentals ledger table
-            RentalDAO.saveRental(newRental);
+                // 2. Log the transaction across the network stream into the server database
+                remoteService.saveRental(newRental);
 
-            // 3. Force the visual interface list to receive the local transaction tracking details
-            allRentals.add(newRental);
-            listRentals.setItems(allRentals);
+                // 3. Clear selections to refresh input slots
+                comboRentalCustomer.setValue(null);
+                comboRentalMovie.setValue(null);
 
-            // 4. Reset dropdown menu lists cleanly back to unselected defaults
-            comboRentalCustomer.setValue(null);
-            comboRentalMovie.setValue(null);
-
-            // 5. Run general housekeeping list refreshes smoothly
-            refreshAllUILists();
+                // 4. Force synchronization sequence
+                refreshAllUILists();
+            } catch (Exception e) {
+                System.err.println("RMI transmission error on leasing transaction processing:");
+                e.printStackTrace();
+            }
         }
     }
 }

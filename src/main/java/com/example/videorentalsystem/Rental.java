@@ -1,6 +1,6 @@
 package com.example.videorentalsystem;
 
-public class Rental {
+public class Rental implements java.io.Serializable {
     private int id; // Holds the rentals ledger table Primary Key barcode
     private Customer customer; // Composition link: Maps to client_id Foreign Key in the DB
     private Movie movie;       // Composition link: Maps to movie_id Foreign Key in the DB

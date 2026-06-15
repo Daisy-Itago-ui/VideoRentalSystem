@@ -1,6 +1,6 @@
 package com.example.videorentalsystem;
 
-public class Movie {
+public class Movie implements java.io.Serializable {
     private int id; // Holds the database Primary Key barcode
     private String title;
     private Genre genre; // Composition link: physically connects a Movie to its Genre object

@@ -1,6 +1,6 @@
 package com.example.videorentalsystem;
 
-public class Customer {
+public class Customer implements java.io.Serializable {
     private int id;
     private String fullName;
 

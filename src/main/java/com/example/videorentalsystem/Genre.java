@@ -1,6 +1,6 @@
 package com.example.videorentalsystem;
 
-public class Genre {
+public class Genre implements java.io.Serializable {
     private int id;
     private String name;
 
