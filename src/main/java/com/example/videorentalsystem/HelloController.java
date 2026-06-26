@@ -33,6 +33,8 @@ public class HelloController {
 
     @FXML private TextField txtMovieTitle;
     @FXML private ComboBox<Genre> comboMovieGenre;
+    @FXML private ComboBox<Movie> comboRegisteredMovies;
+    @FXML private ComboBox<Customer> comboRegisteredCustomers;
     @FXML private ListView<Movie> listMovies;
 
     @FXML private TextField txtCustomerName;
@@ -41,6 +43,9 @@ public class HelloController {
     @FXML private ComboBox<Customer> comboRentalCustomer;
     @FXML private ComboBox<Movie> comboRentalMovie;
     @FXML private ListView<Rental> listRentals;
+    @FXML private ComboBox<Genre> comboRentalGenreFilter;
+    @FXML private ComboBox<Rental> comboRentalBorrowed;
+    @FXML private ComboBox<Rental> comboRentalReturned;
 
     // --- AUTOMATIC NETWORK INITIALIZATION LOAD ---
     @FXML
@@ -85,20 +90,25 @@ public class HelloController {
             listGenres.setItems(allGenres);
             comboMovieGenre.setItems(allGenres);
 
-            listMovies.setItems(allMovies);
+            // CHANGED THIS LINE: Now points to your new dropdown menu ID
+            comboRegisteredMovies.setItems(allMovies);
             comboRentalMovie.setItems(allMovies);
 
-            listCustomers.setItems(allCustomers);
+            comboRegisteredCustomers.setItems(allCustomers);
             comboRentalCustomer.setItems(allCustomers);
 
-            listRentals.setItems(allRentals);
+            // Map fresh genre data to the new left column filter menu
+            comboRentalGenreFilter.setItems(allGenres);
+
+// Populate the active tracking lists
+            comboRentalBorrowed.setItems(allRentals);
+            comboRentalReturned.setItems(allRentals);
 
         } catch (Exception e) {
             System.err.println("Network exception caught while refreshing layout lists:");
             e.printStackTrace();
         }
     }
-
     // --- 4. THE INTERACTIVE BUTTON ACTIONS ROUTED VIA RMI ---
 
     @FXML

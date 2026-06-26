@@ -2,64 +2,123 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17" fx:controller="com.example.videorentalsystem.HelloController">
     <tabs>
         <Tab text="Genres">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" minWidth="600.0" minHeight="400.0" style="-fx-background-color: BEIGE;">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" halignment="RIGHT" />
+                        <ColumnConstraints minWidth="200.0" halignment="LEFT" />
+                    </columnConstraints>
+
                     <children>
-                        <Label layoutX="14.0" layoutY="27.0" text="Genre Name:" />
-                        <TextField fx:id="txtGenreName" layoutX="101.0" layoutY="23.0" />
-                        <Button layoutX="101.0" layoutY="65.0" mnemonicParsing="Parsing" onAction="#onSaveGenreClick" text="Save Genre" />
-                        <ListView fx:id="listGenres" layoutX="300.0" layoutY="23.0" prefHeight="300.0" prefWidth="250.0" />
+                        <Label text="Name:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="txtGenreName" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Button mnemonicParsing="false" onAction="#onSaveGenreClick" text="Save" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Registered:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="listGenre" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Button mnemonicParsing="false" text="Remove" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                     </children>
-                </AnchorPane>
+                </GridPane>
             </content>
         </Tab>
         <Tab text="Movies">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" minWidth="600.0" minHeight="400.0" style="-fx-background-color: BEIGE;">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" halignment="RIGHT" />
+                        <ColumnConstraints minWidth="200.0" halignment="LEFT" />
+                    </columnConstraints>
+
                     <children>
-                        <Label layoutX="14.0" layoutY="27.0" text="Movie Title:" />
-                        <TextField fx:id="txtMovieTitle" layoutX="101.0" layoutY="23.0" />
+                        <Label text="Genre:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="comboMovieGenre" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                        <Label layoutX="14.0" layoutY="65.0" text="Pick Genre:" />
-                        <ComboBox fx:id="comboMovieGenre" layoutX="101.0" layoutY="61.0" prefWidth="150.0" />
+                        <Label text="Name:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <TextField fx:id="txtMovieTitle" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                        <Button layoutX="101.0" layoutY="105.0" onAction="#onSaveMovieClick" text="Save Movie" />
+                        <Button mnemonicParsing="false" onAction="#onSaveMovieClick" text="Save" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                        <ListView fx:id="listMovies" layoutX="300.0" layoutY="23.0" prefHeight="300.0" prefWidth="250.0" />
+                        <Label text="Registere:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <ComboBox fx:id="comboRegisteredMovies" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Button mnemonicParsing="false" text="Remove" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
-                </AnchorPane>
+                </GridPane>
             </content>
         </Tab>
         <Tab text="Customers">
             <content>
-                <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" minWidth="600.0" minHeight="400.0" style="-fx-background-color: BEIGE;">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" halignment="RIGHT" />
+                        <ColumnConstraints minWidth="200.0" halignment="LEFT" />
+                    </columnConstraints>
+
                     <children>
-                        <Label layoutX="14.0" layoutY="27.0" text="Customer Name:" />
-                        <TextField fx:id="txtCustomerName" layoutX="120.0" layoutY="23.0" />
-                        <Button layoutX="120.0" layoutY="65.0" onAction="#onSaveCustomerClick" text="Add Customer" />
-                        <ListView fx:id="listCustomers" layoutX="300.0" layoutY="23.0" prefHeight="300.0" prefWidth="250.0" />
+                        <Label text="Name:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="txtCustomerName" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Button mnemonicParsing="false" onAction="#onSaveCustomerClick" text="Save" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Registered:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="comboRegisteredCustomers" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Button mnemonicParsing="false" text="Remove" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                     </children>
-                </AnchorPane>
+                </GridPane>
             </content>
         </Tab>
         <Tab text="Rentals">
             <content>
-                <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                <GridPane alignment="CENTER" hgap="15.0" vgap="10.0" minWidth="600.0" minHeight="400.0" style="-fx-background-color: BEIGE;">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100.0" halignment="RIGHT" />
+                        <ColumnConstraints minWidth="160.0" halignment="LEFT" />
+                        <ColumnConstraints minWidth="100.0" halignment="RIGHT" />
+                        <ColumnConstraints minWidth="160.0" halignment="LEFT" />
+                    </columnConstraints>
+
                     <children>
-                        <Label layoutX="14.0" layoutY="27.0" text="Select Customer:" />
-                        <ComboBox fx:id="comboRentalCustomer" layoutX="120.0" layoutY="23.0" prefWidth="150.0" />
+                        <Label text="Custome:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="comboRentalCustomer" prefWidth="160.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                        <Label layoutX="14.0" layoutY="65.0" text="Select Movie:" />
-                        <ComboBox fx:id="comboRentalMovie" layoutX="120.0" layoutY="61.0" prefWidth="150.0" />
+                        <Label text="Genre:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="comboRentalGenreFilter" prefWidth="160.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                        <Button layoutX="120.0" layoutY="105.0" onAction="#onRentMovieClick" text="Rent Movie" />
-                        <ListView fx:id="listRentals" layoutX="300.0" layoutY="23.0" prefHeight="300.0" prefWidth="250.0" />
+                        <Label text="Movies:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="comboRentalMovie" prefWidth="160.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Button mnemonicParsing="false" onAction="#onRentMovieClick" text="Save" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+
+                        <Label text="Borrowed:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="comboRentalBorrowed" prefWidth="160.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                        <Label text="Returned:" style="-fx-font: normal bold 20px 'serif';" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="comboRentalReturned" prefWidth="160.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                        <Button mnemonicParsing="false" text="Return" style="-fx-background-color: darkslateblue; -fx-text-fill: white; -fx-font-size: 13pt;" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                     </children>
-                </AnchorPane>
+                </GridPane>
             </content>
         </Tab>
     </tabs>
