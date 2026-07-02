@@ -28,11 +28,11 @@ public class HelloController {
     // --- 1. NETWORK CONTROLLER STUB LINK ---
     private RemoteRentalService remoteService;
 
-    // --- 2. THE MASTER BUCKETS (Observable lists that update the screen dynamically) ---
-    private ObservableList<Genre> allGenres = FXCollections.observableArrayList();
-    private ObservableList<Movie> allMovies = FXCollections.observableArrayList();
-    private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
-    private ObservableList<Rental> allRentals = FXCollections.observableArrayList();
+    // --- 2. THE MASTER BUCKETS (Synchronized as clean Strings for immediate UI rendering) ---
+    private ObservableList<String> allGenres = FXCollections.observableArrayList();
+    private ObservableList<String> allMovies = FXCollections.observableArrayList();
+    private ObservableList<String> allCustomers = FXCollections.observableArrayList();
+    private ObservableList<String> allRentals = FXCollections.observableArrayList();
 
     // --- 3. THE UI LINKS (Mapped directly to your fx:id tags in the .fxml file) ---
     @FXML
@@ -46,40 +46,45 @@ public class HelloController {
     @FXML
     private TextField txtGenreName;
     @FXML
-    private ComboBox<Genre> listGenres;
+    private ComboBox<String> listGenres; // Corrected to String for display compatibility
 
     @FXML
     private TextField txtMovieTitle;
     @FXML
-    private ComboBox<Genre> comboMovieGenre;
+    private ComboBox<String> comboMovieGenre; // Corrected to String
     @FXML
-    private ComboBox<Movie> comboRegisteredMovies;
+    private ComboBox<String> comboRegisteredMovies; // Corrected to String
     @FXML
-    private ComboBox<Customer> comboRegisteredCustomers;
+    private ComboBox<String> comboRegisteredCustomers; // Corrected to String
     @FXML
-    private ListView<Movie> listMovies;
+    private ListView<String> listMovies; // Corrected to String
 
     @FXML
     private TextField txtCustomerName;
     @FXML
-    private ListView<Customer> listCustomers;
+    private ListView<String> listCustomers; // Corrected to String
 
     @FXML
-    private ComboBox<Customer> comboRentalCustomer;
+    private ComboBox<String> comboRentalCustomer; // Corrected to String
     @FXML
-    private ComboBox<Movie> comboRentalMovie;
+    private ComboBox<String> comboRentalMovie; // Corrected to String
     @FXML
-    private ListView<Rental> listRentals;
+    private ListView<String> listRentals; // Corrected to String
     @FXML
-    private ComboBox<Genre> comboRentalGenreFilter;
+    private ComboBox<String> comboRentalGenreFilter; // Corrected to String
     @FXML
-    private ComboBox<Rental> comboRentalBorrowed;
+    private ComboBox<String> comboRentalBorrowed; // Corrected to String
     @FXML
-    private ComboBox<Rental> comboRentalReturned;
+    private ComboBox<String> comboRentalReturned; // Corrected to String
 
     // --- AUTOMATIC NETWORK & CINEMATIC INITIALIZATION LOAD ---
     @FXML
     public void initialize() {
+        // Force the text fields to explicitly write white text programmatically to solve typing invisibility
+        txtGenreName.setStyle("-fx-text-fill: white; -fx-background-color: #1a1a24;");
+        txtMovieTitle.setStyle("-fx-text-fill: white; -fx-background-color: #1a1a24;");
+        txtCustomerName.setStyle("-fx-text-fill: white; -fx-background-color: #1a1a24;");
+
         // --- SECTION A: CONNECT TO CENTRAL RMI SERVER ---
         try {
             System.out.println("Client UI connecting to centralized RMI Server Registry...");
@@ -116,7 +121,7 @@ public class HelloController {
         ParallelTransition splashAnimation = new ParallelTransition(scaleLogo, fadeInTagline);
         splashAnimation.play();
 
-        // 3. Trigger the crossover transition once the intro finishes (at 2.5 seconds)
+        // 3. Trigger the crossover transition once the intro finishes (at 5.5 seconds)
         splashAnimation.setOnFinished(event -> {
             // Fade out the splash screen overlay layer smoothly
             FadeTransition fadeOutSplash = new FadeTransition(Duration.seconds(0.8), splashScreenContainer);
@@ -152,11 +157,19 @@ public class HelloController {
             allCustomers.clear();
             allRentals.clear();
 
-            // Populate local memory lists with fresh data retrieved via RMI network streams
-            allGenres.addAll(remoteService.getAllGenres());
-            allMovies.addAll(remoteService.getAllMovies());
-            allCustomers.addAll(remoteService.getAllCustomers());
-            allRentals.addAll(remoteService.getAllRentals());
+            // Map fresh data primitives via RMI loops to populate layout layers cleanly
+            for (Genre g : remoteService.getAllGenres()) {
+                allGenres.add(g.getName());
+            }
+            for (Movie m : remoteService.getAllMovies()) {
+                allMovies.add(m.getTitle() + " (" + m.getGenre().getName() + ")");
+            }
+            for (Customer c : remoteService.getAllCustomers()) {
+                allCustomers.add(c.getFullName());
+            }
+            for (Rental r : remoteService.getAllRentals()) {
+                allRentals.add(r.getCustomer().getFullName() + " rented " + r.getMovie().getTitle());
+            }
 
             // Push the synchronized data directly into your visual UI components
             listGenres.setItems(allGenres);
@@ -166,12 +179,16 @@ public class HelloController {
             comboRegisteredCustomers.setItems(allCustomers);
             comboRentalCustomer.setItems(allCustomers);
 
-            // Map fresh genre data to the new left column filter menu
+            // Map fresh genre data to the column filter menu
             comboRentalGenreFilter.setItems(allGenres);
 
             // Populate the active tracking lists
             comboRentalBorrowed.setItems(allRentals);
             comboRentalReturned.setItems(allRentals);
+
+            if (listMovies != null) listMovies.setItems(allMovies);
+            if (listCustomers != null) listCustomers.setItems(allCustomers);
+            if (listRentals != null) listRentals.setItems(allRentals);
 
         } catch (Exception e) {
             System.err.println("Network exception caught while refreshing layout lists:");
@@ -199,11 +216,12 @@ public class HelloController {
     @FXML
     protected void onSaveMovieClick() {
         String title = txtMovieTitle.getText().trim();
-        Genre selectedGenre = comboMovieGenre.getValue();
+        String selectedGenreName = comboMovieGenre.getValue();
 
-        if (!title.isEmpty() && selectedGenre != null) {
+        if (!title.isEmpty() && selectedGenreName != null) {
             try {
-                Movie newMovie = new Movie(title, selectedGenre);
+                Genre targetGenre = new Genre(selectedGenreName);
+                Movie newMovie = new Movie(title, targetGenre);
                 remoteService.saveMovie(newMovie);
                 txtMovieTitle.clear();
                 refreshAllUILists();
@@ -232,11 +250,16 @@ public class HelloController {
 
     @FXML
     protected void onRentMovieClick() {
-        Customer c = comboRentalCustomer.getValue();
-        Movie m = comboRentalMovie.getValue();
+        String customerStr = comboRentalCustomer.getValue();
+        String movieStr = comboRentalMovie.getValue();
 
-        if (c != null && m != null) {
+        if (customerStr != null && movieStr != null) {
             try {
+                // Parse out clean matching constructs for backend delivery
+                Customer c = new Customer(customerStr);
+                String rawMovieTitle = movieStr.contains(" (") ? movieStr.substring(0, movieStr.indexOf(" (")) : movieStr;
+                Movie m = new Movie(rawMovieTitle, new Genre("Unknown"));
+
                 Rental newRental = new Rental(c, m);
                 remoteService.saveRental(newRental);
                 comboRentalCustomer.setValue(null);
